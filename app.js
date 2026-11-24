@@ -130,6 +130,11 @@ function draw() {
 let busy = false;
 async function ask(text) {
   if (busy) return;
+  if (/yedek|verilerimi (al|ver)|başka telefon|telefon(u)? değiş/i.test(text)) {
+    if (tab !== "koc") go("koc");
+    db.chat.push({ role: "user", content: text }, { role: "assistant", content: "Yedek dosyasını hazırladım. Açılan menüden Dosyalar'a kaydet ya da AirDrop ile yeni telefona gönder. Yeni telefonda Ayarlar → İçe aktar. API anahtarı güvenlik için yedeğe girmez, yeni telefonda tekrar yazman gerekir." });
+    save(); draw(); exportData(); return;
+  }
   if (!db.settings.apiKey) { db.chat.push({ role: "assistant", content: "Önce Ayarlar'dan Anthropic API anahtarını girmelisin." }); save(); if (tab !== "koc") go("koc"); else draw(); return; }
   if (tab !== "koc") go("koc");
   db.chat.push({ role: "user", content: text }); busy = true; draw();
@@ -164,6 +169,17 @@ function dictate() {
   r.start();
 }
 
+// ---------- Yedek ----------
+async function exportData() {
+  const d = JSON.parse(JSON.stringify(db)); d.settings.apiKey = "";
+  const name = "asistan-yedek-" + today() + ".json", txt = JSON.stringify(d, null, 2);
+  const f = new File([txt], name, { type: "application/json" });
+  try {
+    if (navigator.canShare && navigator.canShare({ files: [f] })) { await navigator.share({ files: [f], title: "Asistanım yedek" }); return; }
+  } catch (e) { if (e.name === "AbortError") return; }
+  const a = document.createElement("a"); a.href = URL.createObjectURL(f); a.download = name; a.click();
+}
+
 // ---------- Ayarlar ----------
 function vAyar() {
   const s = db.settings;
@@ -186,11 +202,7 @@ function vAyar() {
     save(); go("bugun");
   };
   $("#cc").onclick = () => { db.chat = []; save(); alert("Sohbet temizlendi."); };
-  $("#ex").onclick = () => {
-    const d = JSON.parse(JSON.stringify(db)); d.settings.apiKey = "";
-    const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(d, null, 2)], { type: "application/json" }));
-    a.download = "asistan-yedek.json"; a.click();
-  };
+  $("#ex").onclick = exportData;
   $("#im").onclick = () => {
     const i = document.createElement("input"); i.type = "file"; i.accept = "application/json";
     i.onchange = async () => { try { const d = JSON.parse(await i.files[0].text()); d.settings = { ...db.settings, ...d.settings, apiKey: db.settings.apiKey }; db = { ...DEF, ...d }; save(); go("bugun"); } catch { alert("Dosya okunamadı."); } };

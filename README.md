@@ -2,7 +2,7 @@
 
 Sadece sana özel. Tek kullanıcı, veriler telefonda (localStorage) durur.
 
-**Özellikler:** Günün sözü (ayet / hadis / motivasyon) · Görevler · Hedefler ve ilerleme çubuğu · Claude koç (hedef ve görevlerini bilir, sesli yazma ve sesli okuma) · Yedek al / geri yükle.
+**Özellikler:** Günün sözü (ayet / hadis / motivasyon) · Görevler · Hedefler ve ilerleme çubuğu · Claude koç (hedef ve görevlerini bilir, sesli yazma ve sesli okuma) · Yedek al (Paylaş menüsü, "verilerimi yedekle" demen yeter) / başka telefona geri yükle.
 
 ## 1) Yayınla (bir kere)
 Statik dosyalar, build yok. Herhangi birine koy: Cloudflare Pages, Netlify (sürükle-bırak), Vercel. Adresi gizli tut.
